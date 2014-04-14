@@ -1,6 +1,7 @@
 module AList
     (
-      nil
+      AList
+    , nil
     , put
     , isIn
     , get
@@ -24,7 +25,7 @@ isIn _ [] = False
 isIn c ((x, _):xs) = if c == x then True else isIn c xs
 
 get :: Char -> AList a -> Maybe a
-get c [] = Nothing
+get _ [] = Nothing
 get c ((k, v):xs) = if c == k then Just v else get c xs
 
 del :: Char -> AList a -> AList a
