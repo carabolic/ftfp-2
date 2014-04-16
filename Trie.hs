@@ -4,7 +4,16 @@ module Trie
     , empty
     , insert
     , lkup
-    , remove 
+    , remove
+    , mapT
+    , mapTK
+    , filterT
+    , filterTK
+    , foldT
+    , foldTK
+    , insertTrie
+    , asList
+    , fromList
     ) where
 
 import Data.Maybe (fromMaybe, fromJust)
@@ -42,3 +51,39 @@ remove (c:cs) t@(Node value children) = if c `A.isIn` children
 isLeaf :: Trie a -> Bool
 isLeaf (Node _ []) = True
 isLeaf _           = False
+
+mapT :: (a -> b) -> Trie a -> Trie b
+mapT func = mapTK (\_ v -> func v)
+
+mapTK :: (String -> a -> b) -> Trie a -> Trie b
+mapTK func = mapTK' ""
+  where
+    mapTK' key (Node value children) =
+      Node (fmap (func key) value)
+           (map (\(c, v) -> (c, mapTK' (key ++ [c]) v)) children)
+
+filterT :: (a -> Bool) -> Trie a -> Trie a
+filterT p = filterTK (\_ v -> p v) 
+
+filterTK :: (String -> a -> Bool) -> Trie a -> Trie a
+filterTK = filterTK' ""
+  where
+    filterTK' key p (Node (Just value) children) = Node (if p key value then Just value else Nothing) (map (\(c, v) -> (c, filterTK' (key ++ [c]) p v)) children)
+    filterTK' key p (Node Nothing children) = Node Nothing (map (\(c, v) -> (c, filterTK' (key ++ [c]) p v)) children)
+
+foldT :: (a -> b -> b) -> b -> Trie a -> b
+foldT func = foldTK (\_ v -> func v)
+
+foldTK :: (String -> a -> b -> b) -> b -> Trie a -> b
+foldTK = foldTK' ""
+  where
+    foldTK' key func acc (Node value children) = foldl (\a (c, v) -> foldTK' (key ++ [c]) func a v) (maybe acc (\v -> func key v acc) value) children
+
+insertTrie :: Trie a -> Trie a -> Trie a
+insertTrie = foldTK insert
+
+asList :: Trie a -> [(String, a)]
+asList = foldTK (\key value list -> (key, value):list) []
+
+fromList :: [(String, a)] -> Trie a
+fromList = foldl (\trie (key, val) -> insert key val trie) empty
