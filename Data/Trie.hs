@@ -17,7 +17,7 @@ module Data.Trie
     ) where
 
 import Data.Maybe (fromMaybe, fromJust)
-import qualified AList as A
+import qualified Data.AList as A
 
 data Trie a = Node (Maybe a) (A.AList (Trie a))
             deriving (Show)

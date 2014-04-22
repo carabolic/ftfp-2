@@ -1,4 +1,4 @@
-module AList
+module Data.AList
     (
       AList
     , nil
