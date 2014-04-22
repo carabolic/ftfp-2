@@ -18,11 +18,11 @@ put :: Char -> a -> AList a -> AList a
 put key value []   = [(key, value)]
 put key value ((cK, cV):xs) = if key == cK
                                     then (cK, value):xs
-                                    else (cK, cV):(put key value xs)
+                                    else (cK, cV):put key value xs
 
 isIn :: Char -> AList a -> Bool
 isIn _ [] = False
-isIn c ((x, _):xs) = if c == x then True else isIn c xs
+isIn c ((x, _):xs) = c == x || isIn c xs
 
 get :: Char -> AList a -> Maybe a
 get _ [] = Nothing
