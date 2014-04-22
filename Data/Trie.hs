@@ -1,4 +1,4 @@
-module Trie
+module Data.Trie
     (
       Trie  
     , empty
