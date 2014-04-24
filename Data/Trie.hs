@@ -2,6 +2,8 @@ module Data.Trie
     (
       Trie  
     , empty
+    , singleton
+    , null
     , insert
     , lkup
     , remove
@@ -14,9 +16,23 @@ module Data.Trie
     , insertTrie
     , asList
     , fromList
+    , member
+    , dom
+    , ran
+    , update
+    , removeSet
+    , restrict
+    , pointwise
+    , pointwiseDom
+    , pointwiseRan
+    , mutually
+    , mutuallyDom
+    , mutuallyRan
     ) where
 
-import Data.Maybe (fromMaybe, fromJust)
+import Prelude hiding (null)
+import Data.Maybe (fromMaybe, fromJust, isJust)
+import qualified Data.Set as S
 import qualified Data.AList as A
 
 data Trie a = Node (Maybe a) (A.AList (Trie a))
@@ -24,6 +40,13 @@ data Trie a = Node (Maybe a) (A.AList (Trie a))
 
 empty :: Trie a
 empty = Node Nothing []
+
+singleton :: String -> a -> Trie a
+singleton key value = insert key value empty
+
+null :: Trie a -> Bool
+null (Node _ []) = True
+null _           = False
 
 insert :: String -> a -> Trie a -> Trie a
 insert []     value (Node _ children) = Node (Just value) children
@@ -87,3 +110,39 @@ asList = foldTK (\key value list -> (key, value):list) []
 
 fromList :: [(String, a)] -> Trie a
 fromList = foldl (\trie (key, val) -> insert key val trie) empty
+
+member :: String -> Trie a -> Bool
+member key trie = isJust (lkup key trie)
+
+dom :: Trie a -> S.Set String
+dom = foldTK (\key _ set -> S.insert key set) S.empty
+
+ran :: Ord a => Trie a -> S.Set a
+ran = foldT S.insert S.empty
+
+update :: Trie a -> Trie a -> Trie a
+update = insertTrie
+
+removeSet :: S.Set String -> Trie a -> Trie a
+removeSet keys trie = S.foldr remove trie keys
+
+restrict :: Trie a -> S.Set String -> Trie a
+restrict trie keys = filterTK (\k _ -> k `S.member` keys) trie
+
+pointwise :: ((String, a) -> Bool) -> Trie a -> Bool
+pointwise p trie = foldT (&&) True $ mapTK (curry p) trie
+
+pointwiseDom :: (String -> Bool) -> Trie a -> Bool
+pointwiseDom p = pointwise (\(k, _) -> p k)
+
+pointwiseRan :: (a -> Bool) -> Trie a -> Bool
+pointwiseRan p  = pointwise (\(_, v) -> p v)
+
+mutually :: Eq a => ((String, a) -> (String, a) -> Bool) -> Trie a -> Bool
+mutually p trie = and [p a1 a2 | a1 <- asList trie, a2 <- asList trie, a1 /= a2]
+
+mutuallyDom :: Eq a => (String -> String -> Bool) -> Trie a -> Bool
+mutuallyDom p = mutually (\(k1, _) (k2, _) -> p k1 k2)
+
+mutuallyRan :: Eq a => (a -> a -> Bool) -> Trie a -> Bool
+mutuallyRan p = mutually (\(_, v1) (_, v2) -> p v1 v2)
