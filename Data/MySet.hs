@@ -1,7 +1,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE UndecidableInstances #-}
 
-module Data.Set where
+module Data.MySet where
 
 import qualified Data.MultiSet as M
 
