@@ -36,7 +36,7 @@ import qualified Data.Set as S
 import qualified Data.AList as A
 
 data Trie a = Node (Maybe a) (A.AList (Trie a))
-            deriving (Show)
+            deriving (Eq, Ord, Show)
 
 empty :: Trie a
 empty = Node Nothing []
