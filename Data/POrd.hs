@@ -4,6 +4,7 @@ module Data.POrd where
 
 import Data.List
 import Data.Maybe
+import Data.Word
 import qualified Data.Set as S
 import qualified Data.Trie as T
 
@@ -36,6 +37,9 @@ class (Eq a) => POrd a where
 #endif
 
 -- TODO make Ord a superclass of POrd (somehow?)
+
+instance POrd Word where
+    le = (<=)
 
 instance POrd Int where
     le = (<=)

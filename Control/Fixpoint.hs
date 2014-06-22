@@ -25,10 +25,3 @@ testFunction3 x = x ^ (2 :: Int)
 
 testFunction4 :: S.Set Int -> S.Set Int
 testFunction4 = S.union (S.fromList [1, 7])
-
-instance POrd Word where
-    le = (<=)
-
-instance CPO Word where
-    bottom = minBound
-    lub = max

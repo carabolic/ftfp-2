@@ -4,6 +4,7 @@ module Data.CPO where
 
 import Data.POrd
 import Data.Maybe
+import Data.Word
 import qualified Data.Set as S
 import qualified Data.Trie as T
 
@@ -28,6 +29,10 @@ class (POrd a) => CPO a where
     lub :: a -> a -> a
 
 instance CPO Int where
+    bottom = minBound
+    lub = max
+
+instance CPO Word where
     bottom = minBound
     lub = max
 
